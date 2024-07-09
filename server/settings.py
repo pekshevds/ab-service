@@ -47,13 +47,9 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework.authtoken",
-    "auth_app.apps.AuthAppConfig",
-    "order_app.apps.OrderAppConfig",
     "catalog_app.apps.CatalogAppConfig",
     "image_app.apps.ImageAppConfig",
     "cart_app.apps.CartAppConfig",
-    "wish_list_app.apps.WishListAppConfig",
-    "client_app.apps.ClientAppConfig",
 ]
 
 MIDDLEWARE = [
@@ -175,9 +171,6 @@ MEDIA_ROOT = BASE_DIR / "media/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-AUTH_USER_MODEL = "auth_app.User"
-AUTH_USER_DEFAULT_PASSWORD = "QWEqwe123"
-
 
 CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ALLOW_CREDENTIALS = True

@@ -9,13 +9,13 @@ from cart_app.services import (
     fetch_users_cart,
     add_to_cart,
     delete_from_cart,
-    clear_cart
+    clear_cart,
 )
 
 
 class CartView(APIView):
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.BaseAuthentication]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         queryset = fetch_users_cart(request.user)
@@ -25,8 +25,8 @@ class CartView(APIView):
 
 
 class CartAddView(APIView):
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.BaseAuthentication]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         good = get_object_or_404(Good, id=request.GET.get("good_id", None))
@@ -55,8 +55,8 @@ class CartAddView(APIView):
 
 
 class CartDeleteView(APIView):
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.BaseAuthentication]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         good = get_object_or_404(Good, id=request.GET.get("good_id", 0))
@@ -85,8 +85,8 @@ class CartDeleteView(APIView):
 
 
 class CartClearView(APIView):
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.BaseAuthentication]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         clear_cart(user=request.user)
