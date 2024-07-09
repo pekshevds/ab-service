@@ -51,6 +51,14 @@ class Good(Directory):
         null=True,
         default=0,
     )
+    price = models.DecimalField(
+        verbose_name="Цена",
+        max_digits=15,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        default=0,
+    )
     slug = models.SlugField(max_length=250, null=True, blank=True, unique=True)
     image = models.ForeignKey(
         Image,
@@ -94,42 +102,6 @@ class Good(Directory):
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
-
-
-class PriceKind(Directory):
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta:
-        verbose_name = "Вид цены"
-        verbose_name_plural = "Виды цен"
-
-
-class Price(Base):
-    good = models.ForeignKey(
-        Good, on_delete=models.PROTECT, verbose_name="Номенклатура"
-    )
-    kind = models.ForeignKey(
-        PriceKind, on_delete=models.PROTECT, verbose_name="Вид цены"
-    )
-    price = models.DecimalField(
-        verbose_name="Цена",
-        max_digits=15,
-        decimal_places=2,
-        blank=True,
-        null=True,
-        default=0,
-    )
-
-    def __str__(self) -> str:
-        return f"{self.good}-{self.kind}"
-
-    class Meta:
-        verbose_name = "Запись"
-        verbose_name_plural = "Цены"
-        ordering = [
-            "good",
-        ]
 
 
 class GoodsImage(Base):

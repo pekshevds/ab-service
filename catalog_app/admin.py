@@ -1,16 +1,9 @@
 from django.utils.html import format_html
 from django.contrib import admin
-from catalog_app.models import (
-    Category,
-    Good,
-    GoodsImage,
-    Manufacturer,
-    PriceKind,
-    Price
-)
+from catalog_app.models import Category, Good, GoodsImage, Manufacturer
 
-admin.site.site_header = "Панель администрирования harin"
-admin.site.site_title = "Панель администрирования harin"
+admin.site.site_header = "Панель администрирования ab-service"
+admin.site.site_title = "Панель администрирования ab-service"
 admin.site.index_title = "Добро пожаловать!"
 
 
@@ -19,31 +12,20 @@ class CategoryKindAdmin(admin.ModelAdmin):
     list_display = ("__str__", "id", "parent")
 
 
-@admin.register(PriceKind)
-class PriceKindAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "id",)
-
-
-@admin.register(Price)
-class PriceAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "price", "id",)
-    exclude = ("name",)
-    list_filter = ("kind",)
-
-
 @admin.register(Manufacturer)
 class ManufacturerAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "id",)
-
-
-class PriceInLine(admin.TabularInline):
-    model = Price
-    fields = ("kind", "price",)
+    list_display = (
+        "__str__",
+        "id",
+    )
 
 
 class GoodsImageInLine(admin.TabularInline):
     model = GoodsImage
-    fields = ("image", "preview",)
+    fields = (
+        "image",
+        "preview",
+    )
     readonly_fields = ("preview",)
 
     def preview(self, obj):
@@ -54,13 +36,25 @@ class GoodsImageInLine(admin.TabularInline):
 
 @admin.register(Good)
 class GoodAdmin(admin.ModelAdmin):
-    inlines = [PriceInLine,]
     list_display = (
-        "name", "art",
-        "is_active", "balance", "preview", "category", "manufacturer",
+        "name",
+        "art",
+        "is_active",
+        "balance",
+        "price",
+        "preview",
+        "category",
+        "manufacturer",
+        "id",
     )
-    search_fields = ("name", "art",)
-    list_filter = ("manufacturer", "category",)
+    search_fields = (
+        "name",
+        "art",
+    )
+    list_filter = (
+        "manufacturer",
+        "category",
+    )
 
     def preview(self, obj):
         if obj.image:

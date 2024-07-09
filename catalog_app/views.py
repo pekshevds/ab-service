@@ -15,7 +15,6 @@ from catalog_app.services.good import (
     fetch_goods_queryset_by_group,
 )
 from catalog_app.commons import fetch_goods_by_filters, fetch_filters
-from catalog_app.services.update_catalog import update_catalog_from_json
 from catalog_app.services.category import fetch_menu_by_category
 
 
@@ -106,11 +105,4 @@ class DataView(APIView):
             "params": request.GET,
             "success": True,
         }
-        return Response(response)
-
-
-class UpdateCatalogView(APIView):
-    def post(self, request):
-        update_catalog_from_json(request.data.get("data"))
-        response = {"data": []}
         return Response(response)

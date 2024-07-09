@@ -1,34 +1,66 @@
-from django.db.models import Model
-from cart_app.models import Cart
+from django.http import HttpRequest
+from django.shortcuts import get_object_or_404
+from cart_app.schemas import Cart
+from catalog_app.models import Good
 
 
-def fetch_users_cart(user: Model) -> [Cart]:
-    """Возвращает выборку элементов корзины пользователя user"""
-    return Cart.objects.filter(user=user)
-
-
-def add_to_cart(user: Model, good: Model, quantity: float = 1) -> None:
-    """Добавляет в корзину пользователя user элемент good"""
-    record = Cart.objects.filter(user=user, good=good).first()
-    if not record:
-        Cart.objects.create(user=user, good=good, quantity=quantity)
+def get_cart(request: HttpRequest) -> Cart:
+    cart_json = request.session.get("cart")
+    if cart_json:
+        cart = Cart.model_validate(cart_json)
     else:
-        record.quantity += quantity
-        record.save()
+        cart = Cart()
+        save_cart(request, cart)
+    return cart
 
 
-def delete_from_cart(user: Model, good: Model, quantity: float = 1) -> None:
-    """Удаляет из корзины пользователя user элемент good"""
-    record = Cart.objects.filter(user=user, good=good).first()
-    if record:
-        if quantity >= record.quantity:
-            record.delete()
+def add_to_cart(request: HttpRequest) -> None:
+    good = get_object_or_404(Good, id=request.GET.get("id"))
+    qnt = float(request.GET.get("qnt", 1.0))
+
+    cart = get_cart(request)
+    res = cart.cart_items.get(str(good.id))
+    if not res:
+        cart.cart_items[str(good.id)] = 0
+    cart.cart_items[str(good.id)] += qnt
+    save_cart(request, cart)
+
+
+def set_to_cart(request: HttpRequest) -> None:
+    good = get_object_or_404(Good, id=request.GET.get("id"))
+    qnt = float(request.GET.get("qnt", 1.0))
+
+    cart = get_cart(request)
+    cart.cart_items[str(good.id)] = qnt
+    save_cart(request, cart)
+
+
+def delete_from_cart(request: HttpRequest) -> None:
+    good = get_object_or_404(Good, id=request.GET.get("id"))
+    qnt = float(request.GET.get("qnt", 1.0))
+
+    cart = get_cart(request)
+    res = cart.cart_items.get(str(good.id))
+    if res:
+        if res <= qnt:
+            del cart.cart_items[str(good.id)]
         else:
-            record.quantity -= quantity
-            record.save()
+            cart.cart_items[str(good.id)] -= qnt
+    save_cart(request, cart)
 
 
-def clear_cart(user: Model) -> None:
-    """Очищает корзину пользователя user"""
-    queryset = Cart.objects.filter(user=user)
-    queryset.delete()
+def clear_cart(request: HttpRequest) -> None:
+    cart = Cart()
+    save_cart(request, cart)
+
+
+def save_cart(request: HttpRequest, cart: Cart):
+    request.session["cart"] = cart.model_dump()
+
+
+__all__ = (
+    get_cart,
+    add_to_cart,
+    delete_from_cart,
+    clear_cart,
+)
