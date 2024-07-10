@@ -3,40 +3,21 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.hashers import make_password
-from client_app.models import Client
 
-from auth_app.commons import (
-    default_date_plus_five_min,
-    default_date,
-    default_pin_code
-)
+from auth_app.commons import default_date_plus_five_min, default_date, default_pin_code
 
 
 class User(AbstractUser):
-
     password = models.CharField(
         _("password"),
         max_length=128,
-        default=make_password(settings.AUTH_USER_DEFAULT_PASSWORD)
+        default=make_password(settings.AUTH_USER_DEFAULT_PASSWORD),
     )
 
     description = models.TextField(
-        verbose_name="Описание",
-        null=True,
-        blank=True,
-        editable=True
+        verbose_name="Описание", null=True, blank=True, editable=True
     )
-    client = models.ForeignKey(
-        Client,
-        verbose_name="Клиент",
-        null=True,
-        blank=True,
-        on_delete=models.PROTECT,
-        related_name="users"
-    )
-    email = models.EmailField(_("email address"),
-                              blank=False,
-                              unique=True)
+    email = models.EmailField(_("email address"), blank=False, unique=True)
 
     class Meta:
         verbose_name = "Пользователь"
