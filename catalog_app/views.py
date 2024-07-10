@@ -1,4 +1,5 @@
-from rest_framework import permissions, authentication
+# from rest_framework import authentication
+from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpRequest
@@ -59,8 +60,8 @@ class CategoryView(APIView):
 
 
 class GoodView(APIView):
-    authentication_classes = [authentication.BasicAuthentication]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # authentication_classes = [authentication.BasicAuthentication]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         id = request.GET.get("id", 0)

@@ -8,7 +8,7 @@ from catalog_app.services import (
 from catalog_app.models import Manufacturer
 
 
-def manufacturer_by_id(id: str) -> Manufacturer:
+def manufacturer_by_id(id: str) -> Manufacturer | None:
     return object_by_id(Manufacturer, id=id)
 
 
@@ -16,7 +16,7 @@ def manufacturer_by_id_list(id: list[str]) -> QuerySet:
     return object_by_id_list(Manufacturer, ids=id)
 
 
-def handle_manufacturer(item_dir: dict) -> Manufacturer:
+def handle_manufacturer(item_dir: dict) -> Manufacturer | None:
     return handle_object(Manufacturer, object_dir=item_dir)
 
 

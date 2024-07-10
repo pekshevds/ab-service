@@ -13,7 +13,7 @@ def secret_from_string(string: str) -> str:
     return hash.hexdigest()
 
 
-def fetch_filters(request: HttpRequest) -> list:
+def fetch_filters(request: HttpRequest) -> list[QuerySet]:
     manufacturers = None
     obj_id = request.GET.get("manufacturer_id")
     if obj_id:
