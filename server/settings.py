@@ -98,16 +98,11 @@ if config.USE_SQLITE3:
 else:
     DATABASES = {
         "default": {
-            "ENGINE": config.DB_ENGINE,
-            "HOST": config.DB_HOST,
+            "ENGINE": "django.db.backends.mysql",
             "NAME": config.DB_NAME,
             "USER": config.DB_USER,
             "PASSWORD": config.DB_PASSWORD,
-            "OPTION": {
-                "init_command": "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
-                "charset": "utf8mb4",
-                "autocommit": True,
-            },
+            "HOST": "localhost",
         }
     }
 
