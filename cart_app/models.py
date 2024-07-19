@@ -7,3 +7,7 @@ class Recipient(Directory):
 
     def __str__(self) -> str:
         return f"{self.name} - {self.email}"
+
+    class Meta:
+        verbose_name = "Получатель"
+        verbose_name_plural = "Получатели"
