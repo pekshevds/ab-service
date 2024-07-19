@@ -80,8 +80,10 @@ class UploadGoodSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=11, required=False, allow_blank=True)
     balance = serializers.DecimalField(max_digits=15, decimal_places=3, required=False)
     price = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
-    description = serializers.CharField(max_length=1024, required=False)
-    comment = serializers.CharField(required=False)
+    description = serializers.CharField(
+        max_length=1024, required=False, allow_null=True
+    )
+    comment = serializers.CharField(required=False, allow_null=True)
     manufacturer = ManufacturerSerializer(required=False, allow_null=True)
     category = CategorySerializer(required=False, allow_null=True)
 
