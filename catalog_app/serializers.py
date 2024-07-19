@@ -1,16 +1,30 @@
 from rest_framework import serializers
 from image_app.serializers import ImageSerializer
-from catalog_app.models import Good
+from catalog_app.models import Good, Manufacturer, Category
 
 
 class ManufacturerSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     name = serializers.CharField(max_length=150)
 
+    def create(self, validated_data):
+        manufacturer, _ = Manufacturer.objects.get_or_create(
+            id=validated_data.get("id")
+        )
+        manufacturer.name = validated_data.get("name", manufacturer.name)
+        manufacturer.save()
+        return manufacturer
+
 
 class CategorySerializer(serializers.Serializer):
     id = serializers.UUIDField()
     name = serializers.CharField(max_length=150)
+
+    def create(self, validated_data):
+        category, _ = Category.objects.get_or_create(id=validated_data.get("id"))
+        category.name = validated_data.get("name", category.name)
+        category.save()
+        return category
 
 
 class GoodsImageSerializer(serializers.Serializer):
@@ -70,6 +84,8 @@ class UploadGoodSerializer(serializers.Serializer):
         max_length=1024, required=False, allow_null=True
     )
     comment = serializers.CharField(required=False, allow_null=True)
+    manufacturer = ManufacturerSerializer(required=False, allow_null=True)
+    category = CategorySerializer(required=False, allow_null=True)
 
     def create(self, validated_data):
         good, _ = Good.objects.get_or_create(id=validated_data.get("id"))
@@ -80,5 +96,19 @@ class UploadGoodSerializer(serializers.Serializer):
         good.price = validated_data.get("price", good.price)
         good.description = validated_data.get("description", good.description)
         good.comment = validated_data.get("comment", good.comment)
+
+        manufacturer = validated_data.get("manufacturer")
+        if manufacturer:
+            serializer = ManufacturerSerializer(data=manufacturer)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                good.manufacturer = serializer
+
+        category = validated_data.get("category")
+        if category:
+            serializer = CategorySerializer(data=category)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                good.category = serializer
         good.save()
         return good
