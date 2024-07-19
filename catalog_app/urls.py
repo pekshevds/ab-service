@@ -4,6 +4,7 @@ from catalog_app.views import (
     GoodView,
     DataView,
     CategoryView,
+    UploadGoodView,
 )
 
 
@@ -14,4 +15,5 @@ urlpatterns = [
     path("category/", CategoryView.as_view(), name="category"),
     path("good/", GoodView.as_view(), name="good"),
     path("data/", DataView.as_view(), name="data"),
+    path("upload/", UploadGoodView.as_view(), name="upload"),
 ]

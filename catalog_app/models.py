@@ -8,24 +8,12 @@ from image_app.models import Image
 
 
 class Manufacturer(Directory):
-    count = models.IntegerField(null=True, blank=True, default=0)
-
     class Meta:
         verbose_name = "Производитель"
         verbose_name_plural = "Производители"
 
 
 class Category(Directory):
-    parent = models.ForeignKey(
-        "Category",
-        verbose_name="Родитель",
-        related_name="childs",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
-    count = models.IntegerField(null=True, blank=True, default=0)
-
     class Meta:
         verbose_name = "Категория"
         verbose_name_plural = "Категории"

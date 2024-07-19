@@ -9,7 +9,10 @@ admin.site.index_title = "Добро пожаловать!"
 
 @admin.register(Category)
 class CategoryKindAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "id", "parent")
+    list_display = (
+        "__str__",
+        "id",
+    )
 
 
 @admin.register(Manufacturer)
