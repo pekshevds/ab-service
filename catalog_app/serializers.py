@@ -81,9 +81,9 @@ class UploadGoodSerializer(serializers.Serializer):
     balance = serializers.DecimalField(max_digits=15, decimal_places=3, required=False)
     price = serializers.DecimalField(max_digits=15, decimal_places=2, required=False)
     description = serializers.CharField(
-        max_length=1024, required=False, allow_null=True
+        max_length=1024, required=False, allow_null=True, allow_blank=True
     )
-    comment = serializers.CharField(required=False, allow_null=True)
+    comment = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     manufacturer = ManufacturerSerializer(required=False, allow_null=True)
     category = CategorySerializer(required=False, allow_null=True)
 
@@ -97,18 +97,20 @@ class UploadGoodSerializer(serializers.Serializer):
         good.description = validated_data.get("description", good.description)
         good.comment = validated_data.get("comment", good.comment)
 
-        manufacturer = validated_data.get("manufacturer")
-        if manufacturer:
-            serializer = ManufacturerSerializer(data=manufacturer)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                good.manufacturer = serializer
+        manufacturer_data = validated_data.get("manufacturer")
+        if manufacturer_data:
+            manufacturer, _ = Manufacturer.objects.get_or_create(
+                id=manufacturer_data.get("id")
+            )
+            manufacturer.name = manufacturer_data.get("name", manufacturer.name)
+            manufacturer.save()
+            good.manufacturer = manufacturer
 
-        category = validated_data.get("category")
-        if category:
-            serializer = CategorySerializer(data=category)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                good.category = serializer
+        category_data = validated_data.get("category")
+        if category_data:
+            category, _ = Category.objects.get_or_create(id=category_data.get("id"))
+            category.name = category_data.get("name", category.name)
+            category.save()
+            good.category = category
         good.save()
         return good
