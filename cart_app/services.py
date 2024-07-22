@@ -1,6 +1,9 @@
+from typing import Sequence
+from django.core.mail import send_mail
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from cart_app.schemas import Cart
+from cart_app.models import Recipient
 from catalog_app.models import Good
 
 
@@ -54,13 +57,30 @@ def clear_cart(request: HttpRequest) -> None:
     save_cart(request, cart)
 
 
-def save_cart(request: HttpRequest, cart: Cart):
+def save_cart(request: HttpRequest, cart: Cart) -> None:
     request.session["cart"] = cart.model_dump()
 
 
-__all__ = (
-    get_cart,
-    add_to_cart,
-    delete_from_cart,
-    clear_cart,
+def send_cart(cart: Cart) -> bool:
+    recipient_list = [recipient.email for recipient in Recipient.objects.all()]
+    result = 0
+    if len(recipient_list) > 0:
+        html_message = "<h1>message<h1>"
+        result = send_mail(
+            "Корзина",
+            "Сообщение",
+            None,
+            recipient_list=recipient_list,
+            html_message=html_message,
+        )
+    return True if result == 1 else False
+
+
+__all__: Sequence[str] = (
+    "get_cart",
+    "add_to_cart",
+    "delete_from_cart",
+    "clear_cart",
+    "set_to_cart",
+    "send_cart",
 )

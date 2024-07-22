@@ -8,6 +8,7 @@ from cart_app.services import (
     delete_from_cart,
     clear_cart,
     set_to_cart,
+    send_cart,
 )
 
 
@@ -51,5 +52,15 @@ class CartClearView(APIView):
 
     def get(self, request: HttpRequest):
         clear_cart(request)
+        response = get_cart(request)
+        return Response(response)
+
+
+class CartSendView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request: HttpRequest):
+        if send_cart(get_cart(request)):
+            clear_cart(request)
         response = get_cart(request)
         return Response(response)
