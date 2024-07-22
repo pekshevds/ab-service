@@ -64,3 +64,9 @@ class CartSendView(APIView):
             clear_cart(request)
         response = get_cart(request)
         return Response(response)
+
+    def post(self, request: HttpRequest):
+        if send_cart(get_cart(request)):
+            clear_cart(request)
+        response = get_cart(request)
+        return Response(response)
