@@ -1,15 +1,10 @@
 from rest_framework import permissions, authentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from auth_app.models import User
+from auth_app.models import User, Token
 from auth_app.serializers import UserSerializer
 from auth_app.transport import send_pin_code, fetch_recipient
-from auth_app.services import (
-    add_pin,
-    authenticate,
-    update_or_create_user_token,
-    use_pin_code
-)
+from auth_app.services import add_pin
 
 
 class UserView(APIView):
@@ -44,6 +39,7 @@ class PinView(APIView):
      или адресу электронной почты.
     Порядок получения пользователя определяется в настройках.
     """
+
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
@@ -57,22 +53,14 @@ class PinView(APIView):
 
 
 class TokenView(APIView):
-    """Возвращает токен по имени пользователя и актуальному пину.
-    Пользователь определяется по имени (номеру телефона)
-     или адресу электронной почты.
-    Порядок получения пользователя определяется в настройках.
     """
+    Новый токен
+    """
+
     permission_classes = [permissions.AllowAny]
 
-    def post(self, request):
-        username = request.POST.get("username")
-        pincode = request.POST.get("pincode")
-        user = authenticate(username, pincode)
-        if user is not None:
-            token = update_or_create_user_token(user=user)
-            if token is not None:
-                use_pin_code(pincode)
-                return Response({"data": {
-                    "token": token.key
-                }})
+    def get(self, request):
+        token = Token.objects.create()
+        if token:
+            return Response({"data": {"token": token.id}})
         return Response({"data": None})

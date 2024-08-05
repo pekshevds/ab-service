@@ -1,67 +1,54 @@
-from typing import Sequence
+from typing import Sequence, TypeAlias
+from decimal import Decimal
 from django.core.mail import send_mail
-from django.http import HttpRequest
+from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-from cart_app.schemas import Cart
-from cart_app.models import Recipient
+from auth_app.models import Token
+from cart_app.models import Recipient, CartItem
 from catalog_app.models import Good
 
-
-def get_cart(request: HttpRequest) -> Cart:
-    cart_json = request.session.get("cart")
-    if cart_json:
-        cart = Cart.model_validate(cart_json)
-    else:
-        cart = Cart()
-        save_cart(request, cart)
-    return cart
+CartItems: TypeAlias = QuerySet[CartItem]
 
 
-def add_to_cart(request: HttpRequest) -> None:
-    good = get_object_or_404(Good, id=request.GET.get("id"))
-    qnt = float(request.GET.get("qnt", 1.0))
-
-    cart = get_cart(request)
-    res = cart.cart_items.get(str(good.id))
-    if not res:
-        cart.cart_items[str(good.id)] = 0
-    cart.cart_items[str(good.id)] += qnt
-    save_cart(request, cart)
+def get_token(token: str) -> Token:
+    return get_object_or_404(Token, id=token)
 
 
-def set_to_cart(request: HttpRequest) -> None:
-    good = get_object_or_404(Good, id=request.GET.get("id"))
-    qnt = float(request.GET.get("qnt", 1.0))
-
-    cart = get_cart(request)
-    cart.cart_items[str(good.id)] = qnt
-    save_cart(request, cart)
+def get_good(good_id: str) -> Good:
+    return get_object_or_404(Good, id=good_id)
 
 
-def delete_from_cart(request: HttpRequest) -> None:
-    good = get_object_or_404(Good, id=request.GET.get("id"))
-    qnt = float(request.GET.get("qnt", 1.0))
+def get_cart(token: Token) -> CartItems:
+    return CartItem.objects.filter(token=token).all()
 
-    cart = get_cart(request)
-    res = cart.cart_items.get(str(good.id))
-    if res:
-        if res <= qnt:
-            del cart.cart_items[str(good.id)]
+
+def add_to_cart(token: Token, good: Good, qnt: Decimal = Decimal("1")) -> None:
+    cart_item, _ = CartItem.objects.get_or_create(token=token, good=good)
+    cart_item.qnt += qnt
+    cart_item.save()
+
+
+def set_to_cart(token: Token, good: Good, qnt: Decimal = Decimal("1")) -> None:
+    cart_item, _ = CartItem.objects.get_or_create(token=token, good=good)
+    cart_item.qnt = qnt
+    cart_item.save()
+
+
+def delete_from_cart(token: Token, good: Good, qnt: Decimal = Decimal("1")) -> None:
+    cart_item = CartItem.objects.filter(token=token, good=good).first()
+    if cart_item:
+        if cart_item.qnt <= qnt:
+            cart_item.delete()
         else:
-            cart.cart_items[str(good.id)] -= qnt
-    save_cart(request, cart)
+            cart_item.qnt -= qnt
+            cart_item.save()
 
 
-def clear_cart(request: HttpRequest) -> None:
-    cart = Cart()
-    save_cart(request, cart)
+def clear_cart(token: Token) -> None:
+    CartItem.objects.filter(token=token).delete()
 
 
-def save_cart(request: HttpRequest, cart: Cart) -> None:
-    request.session["cart"] = cart.model_dump()
-
-
-def send_cart(cart: Cart) -> bool:
+def send_cart(cart_items: CartItems) -> bool:
     recipient_list = [recipient.email for recipient in Recipient.objects.all()]
     result = 0
     if len(recipient_list) > 0:
