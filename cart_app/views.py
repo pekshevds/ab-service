@@ -43,7 +43,7 @@ class CartAddView(APIView):
             token = get_token(token=token)
             add_to_cart(
                 token=token,
-                good=get_good(good_id=request.GET.get("good_id")),
+                good=get_good(good_id=request.GET.get("id")),
                 qnt=Decimal(request.GET.get("qnt", "1")),
             )
             serializer = CartSerializer(get_cart(token=token), many=True)
@@ -62,7 +62,7 @@ class CartSetView(APIView):
             token = get_token(token=token)
             set_to_cart(
                 token=token,
-                good=get_good(good_id=request.GET.get("good_id")),
+                good=get_good(good_id=request.GET.get("id")),
                 qnt=Decimal(request.GET.get("qnt", "1")),
             )
             serializer = CartSerializer(get_cart(token=token), many=True)
@@ -81,7 +81,7 @@ class CartDeleteView(APIView):
             token = get_token(token=token)
             delete_from_cart(
                 token=token,
-                good=get_good(good_id=request.GET.get("good_id")),
+                good=get_good(good_id=request.GET.get("id")),
                 qnt=Decimal(request.GET.get("qnt", "1")),
             )
             serializer = CartSerializer(get_cart(token=token), many=True)
