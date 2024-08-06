@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.test import TestCase
 from catalog_app.models import Good
 from auth_app.models import Token
@@ -11,46 +12,68 @@ class CartTest(TestCase):
         self._token1 = Token.objects.create()
 
     def test_cart(self):
-        headers = {"token": str(self._token1)}
-        resp = self.client.get("/api/v1/cart/", headers=headers)
-        self.assertEqual(resp.status_code, 200)
+        response = self.client.get("/api/v1/cart/", HTTP_token=str(self._token1))
+        self.assertEqual(response.status_code, 200)
 
     def test_add_cart(self):
-        resp = self.client.get(f"/api/v1/cart/add/?id={self._good1.id}")
+        resp = self.client.get(
+            f"/api/v1/cart/add/?id={self._good1.id}", HTTP_token=str(self._token1)
+        )
         self.assertEqual(resp.status_code, 200)
 
         cart = resp.data
         self.assertIsNotNone(cart, None)
-        self.assertEqual(len(cart.cart_items), 1)
+        self.assertEqual(len(cart.get("data")), 1)
 
-        resp = self.client.get(f"/api/v1/cart/add/?id={self._good2.id}")
+        resp = self.client.get(
+            f"/api/v1/cart/add/?id={self._good2.id}", HTTP_token=str(self._token1)
+        )
         self.assertEqual(resp.status_code, 200)
-        resp = self.client.get(f"/api/v1/cart/add/?id={self._good3.id}")
-        self.assertEqual(resp.status_code, 200)
-
-    """def test_set_cart(self):
-        resp = self.client.get(f"/api/v1/cart/set/?id={self._good1.id}&qnt=5")
-        self.assertEqual(resp.status_code, 200)
-        resp = self.client.get(f"/api/v1/cart/set/?id={self._good2.id}&qnt=5")
-        self.assertEqual(resp.status_code, 200)
-        resp = self.client.get(f"/api/v1/cart/set/?id={self._good3.id}&qnt=5")
+        resp = self.client.get(
+            f"/api/v1/cart/add/?id={self._good3.id}", HTTP_token=str(self._token1)
+        )
         self.assertEqual(resp.status_code, 200)
 
+    def test_set_cart(self):
+        resp = self.client.get(
+            f"/api/v1/cart/set/?id={self._good1.id}&qnt=5", HTTP_token=str(self._token1)
+        )
+        self.assertEqual(resp.status_code, 200)
+        resp = self.client.get(
+            f"/api/v1/cart/set/?id={self._good2.id}", HTTP_token=str(self._token1)
+        )
+        self.assertEqual(resp.status_code, 200)
+        resp = self.client.get(
+            f"/api/v1/cart/set/?id={self._good3.id}&qnt=5", HTTP_token=str(self._token1)
+        )
+        self.assertEqual(resp.status_code, 200)
         cart = resp.data
         self.assertIsNotNone(cart, None)
-        self.assertEqual(cart.cart_items.get(str(self._good3.id)), 5.0)
-        self.assertNotEqual(cart.cart_items.get(str(self._good3.id)), 1.0)
+        cart_items = cart.get("data")
+        self.assertEqual(len(cart_items), 3)
+        item3 = cart_items[2]
+        self.assertEqual(Decimal(item3.get("qnt")), Decimal("5"))
+        self.assertNotEqual(Decimal(item3.get("qnt")), Decimal("1"))
 
     def test_delete_cart(self):
-        resp = self.client.get(f"/api/v1/cart/delete/?id={self._good1.id}&qnt=5")
+        resp = self.client.get(
+            f"/api/v1/cart/delete/?id={self._good1.id}&qnt=5",
+            HTTP_token=str(self._token1),
+        )
         self.assertEqual(resp.status_code, 200)
-        resp = self.client.get(f"/api/v1/cart/delete/?id={self._good2.id}&qnt=5")
+        resp = self.client.get(
+            f"/api/v1/cart/delete/?id={self._good2.id}&qnt=5",
+            HTTP_token=str(self._token1),
+        )
         self.assertEqual(resp.status_code, 200)
-        resp = self.client.get(f"/api/v1/cart/delete/?id={self._good3.id}&qnt=5")
+        resp = self.client.get(
+            f"/api/v1/cart/delete/?id={self._good3.id}&qnt=5",
+            HTTP_token=str(self._token1),
+        )
         self.assertEqual(resp.status_code, 200)
 
     def test_clear_cart(self):
-        resp = self.client.get("/api/v1/cart/clear/")
+        resp = self.client.get("/api/v1/cart/clear/", HTTP_token=str(self._token1))
         self.assertEqual(resp.status_code, 200)
         cart = resp.data
-        self.assertEqual(len(cart.cart_items), 0)"""
+        self.assertEqual(len(cart.get("data")), 0)
