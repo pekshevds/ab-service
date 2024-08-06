@@ -12,12 +12,12 @@ class CartTest(TestCase):
         self._token1 = Token.objects.create()
 
     def test_cart(self):
-        response = self.client.get("/api/v1/cart/", HTTP_token=str(self._token1))
+        response = self.client.get(f"/api/v1/cart/?token={str(self._token1)}")
         self.assertEqual(response.status_code, 200)
 
     def test_add_cart(self):
         resp = self.client.get(
-            f"/api/v1/cart/add/?id={self._good1.id}", HTTP_token=str(self._token1)
+            f"/api/v1/cart/add/?token={str(self._token1)}&id={self._good1.id}"
         )
         self.assertEqual(resp.status_code, 200)
 
@@ -26,25 +26,26 @@ class CartTest(TestCase):
         self.assertEqual(len(cart.get("data")), 1)
 
         resp = self.client.get(
-            f"/api/v1/cart/add/?id={self._good2.id}", HTTP_token=str(self._token1)
+            f"/api/v1/cart/add/?token={str(self._token1)}&id={self._good2.id}"
         )
+
         self.assertEqual(resp.status_code, 200)
         resp = self.client.get(
-            f"/api/v1/cart/add/?id={self._good3.id}", HTTP_token=str(self._token1)
+            f"/api/v1/cart/add/?token={str(self._token1)}&id={self._good3.id}"
         )
         self.assertEqual(resp.status_code, 200)
 
     def test_set_cart(self):
         resp = self.client.get(
-            f"/api/v1/cart/set/?id={self._good1.id}&qnt=5", HTTP_token=str(self._token1)
+            f"/api/v1/cart/set/?token={str(self._token1)}&id={self._good1.id}&qnt=5"
         )
         self.assertEqual(resp.status_code, 200)
         resp = self.client.get(
-            f"/api/v1/cart/set/?id={self._good2.id}", HTTP_token=str(self._token1)
+            f"/api/v1/cart/set/?token={str(self._token1)}&id={self._good2.id}"
         )
         self.assertEqual(resp.status_code, 200)
         resp = self.client.get(
-            f"/api/v1/cart/set/?id={self._good3.id}&qnt=5", HTTP_token=str(self._token1)
+            f"/api/v1/cart/set/?token={str(self._token1)}&id={self._good3.id}&qnt=5"
         )
         self.assertEqual(resp.status_code, 200)
         cart = resp.data
@@ -57,23 +58,20 @@ class CartTest(TestCase):
 
     def test_delete_cart(self):
         resp = self.client.get(
-            f"/api/v1/cart/delete/?id={self._good1.id}&qnt=5",
-            HTTP_token=str(self._token1),
+            f"/api/v1/cart/delete/?token={str(self._token1)}&id={self._good1.id}&qnt=5"
         )
         self.assertEqual(resp.status_code, 200)
         resp = self.client.get(
-            f"/api/v1/cart/delete/?id={self._good2.id}&qnt=5",
-            HTTP_token=str(self._token1),
+            f"/api/v1/cart/delete/?token={str(self._token1)}&id={self._good2.id}&qnt=5"
         )
         self.assertEqual(resp.status_code, 200)
         resp = self.client.get(
-            f"/api/v1/cart/delete/?id={self._good3.id}&qnt=5",
-            HTTP_token=str(self._token1),
+            f"/api/v1/cart/delete/?token={str(self._token1)}&id={self._good3.id}&qnt=5"
         )
         self.assertEqual(resp.status_code, 200)
 
     def test_clear_cart(self):
-        resp = self.client.get("/api/v1/cart/clear/", HTTP_token=str(self._token1))
+        resp = self.client.get(f"/api/v1/cart/clear/?token={str(self._token1)}")
         self.assertEqual(resp.status_code, 200)
         cart = resp.data
         self.assertEqual(len(cart.get("data")), 0)

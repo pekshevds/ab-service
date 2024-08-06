@@ -22,7 +22,7 @@ class CartView(APIView):
 
     def get(self, request: HttpRequest):
         response = {"data": None}
-        token = request.headers.get("token")
+        token = request.GET.get("token")
         serializer = TokenSerializer(data={"token": token})
         if serializer.is_valid(raise_exception=True):
             serializer = CartSerializer(
@@ -37,7 +37,7 @@ class CartAddView(APIView):
 
     def get(self, request: HttpRequest):
         response = {"data": None}
-        token = request.headers.get("token")
+        token = request.GET.get("token")
         serializer = TokenSerializer(data={"token": token})
         if serializer.is_valid(raise_exception=True):
             token = get_token(token=token)
@@ -56,7 +56,7 @@ class CartSetView(APIView):
 
     def get(self, request: HttpRequest):
         response = {"data": None}
-        token = request.headers.get("token")
+        token = request.GET.get("token")
         serializer = TokenSerializer(data={"token": token})
         if serializer.is_valid(raise_exception=True):
             token = get_token(token=token)
@@ -75,7 +75,7 @@ class CartDeleteView(APIView):
 
     def get(self, request: HttpRequest):
         response = {"data": None}
-        token = request.headers.get("token")
+        token = request.GET.get("token")
         serializer = TokenSerializer(data={"token": token})
         if serializer.is_valid(raise_exception=True):
             token = get_token(token=token)
@@ -94,7 +94,7 @@ class CartClearView(APIView):
 
     def get(self, request: HttpRequest):
         response = {"data": None}
-        token = request.headers.get("token")
+        token = request.GET.get("token")
         serializer = TokenSerializer(data={"token": token})
         if serializer.is_valid(raise_exception=True):
             token = get_token(token=token)
@@ -109,7 +109,7 @@ class CartSendView(APIView):
 
     def get(self, request: HttpRequest):
         response = {"data": None}
-        token = request.headers.get("token")
+        token = request.GET.get("token")
         serializer = TokenSerializer(data={"token": token})
         if serializer.is_valid(raise_exception=True):
             token = get_token(token=token)
@@ -121,12 +121,4 @@ class CartSendView(APIView):
 
     def post(self, request: HttpRequest):
         response = {"data": None}
-        token = request.headers.get("token")
-        serializer = TokenSerializer(data={"token": token})
-        if serializer.is_valid(raise_exception=True):
-            token = get_token(token=token)
-            if send_cart(get_cart(token=token)):
-                clear_cart(token=token)
-            serializer = CartSerializer(get_cart(token=token), many=True)
-            response["data"] = serializer.data
         return Response(response)
