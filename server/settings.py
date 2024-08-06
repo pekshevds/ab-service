@@ -32,6 +32,8 @@ ALLOWED_HOSTS = [
     "localhost",
     "back.ab-service.annasoft.site",
     "www.back.ab-service.annasoft.site",
+    "abservice.annasoft.site",
+    "www.abservice.annasoft.site",
 ]
 
 
