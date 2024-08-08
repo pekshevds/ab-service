@@ -3,7 +3,7 @@ from django.http import HttpRequest
 from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from auth_app.serializers import TokenSerializer
+from auth_app.serializers import TokenSerializer, DataSerializer
 from cart_app.serializers import CartSerializer
 from cart_app.services import (
     get_token,
@@ -109,11 +109,23 @@ class CartSendView(APIView):
 
     def get(self, request: HttpRequest):
         response = {"data": None}
-        token = request.GET.get("token")
-        serializer = TokenSerializer(data={"token": token})
+        serializer = DataSerializer(
+            data={
+                "token": request.GET.get("token"),
+                "name": request.GET.get("name", ""),
+                "phone": request.GET.get("phone", ""),
+                "email": request.GET.get("email", ""),
+            }
+        )
         if serializer.is_valid(raise_exception=True):
-            token = get_token(token=token)
-            if send_cart(get_cart(token=token)):
+            token = get_token(token=serializer.data.get("token"))
+            context = {
+                "cart_items": get_cart(token=token),
+                "name": serializer.data.get("name"),
+                "phone": serializer.data.get("phone"),
+                "email": serializer.data.get("email"),
+            }
+            if send_cart(context):
                 clear_cart(token=token)
             serializer = CartSerializer(get_cart(token=token), many=True)
             response["data"] = serializer.data

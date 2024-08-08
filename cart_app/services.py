@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.core.mail import send_mail
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
+from django.template import loader
 from auth_app.models import Token
 from cart_app.models import Recipient, CartItem
 from catalog_app.models import Good
@@ -48,11 +49,15 @@ def clear_cart(token: Token) -> None:
     CartItem.objects.filter(token=token).delete()
 
 
-def send_cart(cart_items: CartItems) -> bool:
+def prepare_html_message(context: dict):
+    return loader.render_to_string("cart_app/message.html", context)
+
+
+def send_cart(context: dict) -> bool:
     recipient_list = [recipient.email for recipient in Recipient.objects.all()]
     result = 0
     if len(recipient_list) > 0:
-        html_message = "<h1>message<h1>"
+        html_message = prepare_html_message(context)
         result = send_mail(
             "Корзина",
             "Сообщение",
