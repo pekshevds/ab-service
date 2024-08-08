@@ -24,7 +24,7 @@ class CartItem(Base):
         decimal_places=3,
         blank=True,
         null=True,
-        default=1,
+        default=0,
     )
 
     class Meta:
